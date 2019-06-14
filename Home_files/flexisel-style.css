@@ -1,0 +1,79 @@
+
+#flexiselDemo1, #flexiselDemo2, #flexiselDemo3 {
+display:none;
+}
+
+.nbs-flexisel-container {
+    position:relative;
+    max-width:100%;
+}
+.nbs-flexisel-ul {
+    position:relative;
+    width:99999px;
+    margin:0px;
+    padding:0px;
+    list-style-type:none;   
+    text-align:center;  
+}
+#flexiselDemo2 .nbs-flexisel-item{float: left; margin:10px; /* padding:5px; */position: relative; line-height: 0px;}
+.feedbackmain{background-color: #fff;border: solid 1px #dedede; padding:20px 26px;position: relative;opacity: 0.5}
+.feedbackmain:hover {border: solid 1px #dedede;opacity: 1}
+.feedbackmain:hover:before{border-bottom: 3px solid #f1b43b;content: '';position: absolute;top: 0;left: 0;width: 100%;}
+.feedbackmain p,.feedbackmain span {text-align: left;margin-bottom: 10px;}
+.feedbackmain span {float: left;}
+.nbs-flexisel-inner {position: relative;overflow: hidden;float:left;width:100%;background:transparent;border:0px solid #ccc; margin: 0 0 40px 0}
+#flexiselDemo3 .nbs-flexisel-item {float: left; margin:10px; /* padding:5px; */position: relative; line-height: 0px;    height: 250px;
+    border-radius: 3px;
+    -webkit-box-shadow: 0 2px 1px rgba(194,193,193,.75);
+    -moz-box-shadow: 0 2px 1px rgba(194,193,193,.75);
+    box-shadow: 0 2px 1px rgba(194,193,193,.75);
+    border: solid 5px #eee;}
+.nbs-flexisel-item img {
+    max-width: 100%;
+    cursor: pointer;
+    position: relative;
+    margin-top: 10px;
+    margin-bottom: 10px;
+	object-fit: cover;
+	height:150px;
+}
+
+/*** Navigation ***/
+
+.nbs-flexisel-nav-left,
+.nbs-flexisel-nav-right {
+    padding:5px 10px;
+    border-radius:15px;
+    -moz-border-radius:15px;
+    -webkit-border-radius:15px;      
+    position: absolute;
+    cursor: pointer;
+    z-index: 4;
+    top:40%;
+    background: rgba(0,0,0,0.5);
+    color: #fff;     
+}
+
+.nbs-flexisel-nav-left {
+    left: 10px;
+}
+
+.nbs-flexisel-nav-left:before {
+    content: "<"
+}
+
+.nbs-flexisel-nav-left.disabled {
+    opacity: 0.4;
+}
+
+.nbs-flexisel-nav-right {
+    right: 5px;    
+}
+
+.nbs-flexisel-nav-right:before {
+    content: ">"
+}
+
+.nbs-flexisel-nav-right.disabled {
+    opacity: 0.4;
+}

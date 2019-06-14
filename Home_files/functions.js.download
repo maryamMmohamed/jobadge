@@ -1,0 +1,334 @@
+var AnimationStep = 25; 
+var AnimationInterval = 10; 
+var LoginHeight = 240;
+var c_step=0;
+var site_url = 'https://www.jobadge.codex-global.com/';
+
+function ShowLogin() 
+{
+	var oDiv = document.getElementById("main-login-form");
+		
+	if (c_step < (LoginHeight / AnimationInterval))
+	{
+		oDiv.style.display = "block";
+	 
+		Animate(oDiv);
+	}
+	else
+	{
+		HideAnimate(oDiv);
+	}
+}
+
+function HideLogin() 
+{
+	
+	var oDiv = document.getElementById("main-login-form");
+	HideAnimate(oDiv);
+}
+
+function HideAnimate(element) 
+{
+   
+    if (c_step <= 0)
+	{
+		element.style.display = "none";
+		return true;
+	}
+        
+	
+	c_step--;	
+	
+	element.style.clip="rect(0px 500px "+(c_step*AnimationStep)+"px 0px)";
+	
+    window.setTimeout(function() {
+        HideAnimate(element);
+    }, AnimationInterval);
+    return false;
+}
+
+
+function Animate(element) 
+{
+   
+    if (c_step >= (LoginHeight / AnimationInterval))
+        return true;
+	
+	c_step++;	
+	
+	element.style.clip="rect(0px 500px "+(c_step*AnimationStep)+"px 0px)";
+	
+    window.setTimeout(function() {
+        Animate(element);
+    }, AnimationInterval);
+    return false;
+}
+
+
+
+function ShowHide(div_name)
+{
+
+	if(document.getElementById(div_name).style.display=="block")
+	{
+		document.getElementById(div_name).style.display="none";
+	}
+	else
+	{
+		
+		document.getElementById(div_name).style.display="block";
+	}
+
+}
+
+
+
+function DeleteSavedListing(id)
+{
+	var saved_listings = r_cookie("saved_listings");
+	
+	if(saved_listings.indexOf(id+",") != -1)
+	{
+		saved_listings=saved_listings.replace(id+",","");
+		
+		//document.cookie="saved_listings="+saved_listings;
+		document.cookie="saved_listings="+saved_listings+";path=/;domain=jobadge.codex-global.com";
+		
+		$("#save_"+id).removeAttr("href");
+		window.location.reload();
+		//$("#save_"+id).text("Deleted"); 
+	}
+}
+
+function SaveListing(id)
+{
+	var saved_listings = r_cookie("saved_listings");
+	
+	if(saved_listings.indexOf(id+",") != -1)
+	{
+		
+	}
+	else
+	{
+		
+		saved_listings+=id+",";
+		//document.cookie="saved_listings="+saved_listings;
+		document.cookie="saved_listings="+saved_listings+";path=/;domain=jobadge.codex-global.com";
+		
+		$("#save_"+id).removeAttr("href");
+		window.location.reload();
+		//$("#save_"+id).text("Saved"); 
+	}
+}
+
+function r_cookie(cname)
+{
+	var name = cname + "=";
+	var ca = document.cookie.split(';');
+	for(var i=0; i<ca.length; i++) 
+	  {
+	  var c = ca[i].trim();
+	  if (c.indexOf(name)==0) return c.substring(name.length,c.length);
+	  }
+	return "";
+}
+
+function cancelDropDown(type,lang)
+{
+	lang = typeof lang !== 'undefined' ? lang : "en";
+	
+	document.getElementById("label_"+type).innerHTML="";
+	reload_items("",type,(type=="category"?"Category":"Location"),lang);
+}
+
+function dropDownChange(x,type,lang)
+{
+	lang = typeof lang !== 'undefined' ? lang : "en";
+	
+	var selected_option= x.options[x.selectedIndex].value;
+	
+	
+	if(selected_option!=""&&selected_option!="-1")
+	{
+		document.getElementById("field_"+type).value=selected_option;
+		var selected_options = selected_option.split("@");
+		reload_items(selected_options[0],type,selected_options[1],lang);
+	}
+}
+
+function reload_items(selected_location,type,selected_value,lang)
+{
+	lang = typeof lang !== 'undefined' ? lang : "en";
+	
+	if (window.XMLHttpRequest)
+	{
+		xmlhttp=new XMLHttpRequest();
+	}
+	else
+	{
+		xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+	}
+	xmlhttp.onreadystatechange=function()
+	{
+		if (xmlhttp.readyState==4 && xmlhttp.status==200)
+		{
+			fill_dropdown(xmlhttp.responseText,type,selected_value,selected_location,lang);
+		}
+	}
+	
+	xmlhttp.open("GET",site_url+"include/suggest_"+type+".php?location="+selected_location+"&lang="+lang+"&q=",true);
+	xmlhttp.send(null);
+
+}
+
+
+
+
+function fill_dropdown(text,type,selected_value,selected_location,lang)
+{
+	if(text!="" && text!="no suggestion")
+	{
+		lang = typeof lang !== 'undefined' ? lang : "en";
+		
+		drop_down=document.getElementById(type);
+		var new_html="";
+		var splitArray = text.split("~");
+
+		var j = 0;
+		
+		if(splitArray.length>=1)
+		{
+			drop_down.options.length = 1;
+			
+			
+			if(selected_location=="")
+			{
+				if(type=="category"&&typeof cancel_category !== 'undefined')
+				{
+					document.getElementById("label_"+type).innerHTML=cancel_category;	
+				}
+				else
+				if(type=="location"&&typeof cancel_location !== 'undefined')
+				{
+					document.getElementById("label_"+type).innerHTML=cancel_location;	
+				}
+				else
+				{
+					document.getElementById("label_"+type).innerHTML="<br/>";
+				}
+			}
+			else
+			{
+				if(document.getElementById("label_"+type).innerHTML.indexOf("cancelDropDown") == -1)
+				{
+					document.getElementById("label_"+type).innerHTML="<a  class=\"button item-center\"  href=\"javascript:cancelDropDown('"+type+"','"+lang+"')\"><img src=\""+site_url+"images/small-x.png\" alt=\"\"/> "+selected_value+"</a> ";
+				}
+				else
+				{
+					document.getElementById("label_"+type).innerHTML+="<a  class=\"button item-center\" href=\"javascript:cancelDropDown('"+type+"','"+lang+"')\"><img src=\""+site_url+"images/small-x.png\" alt=\"\"/> "+selected_value+"</a>";	
+				}
+			}
+		}	
+
+		
+		for(j = 0; j < splitArray.length; j++)
+		{
+			var location = splitArray[j].split("#");
+		
+			if(location[0]=="no suggestion"||location[1]=="no suggestion"||location[0]=="")
+			continue;
+			
+			drop_down.options[j+1] = new Option(location[0],location[1]+"@"+location[0]);
+		
+		}
+	}
+}
+/*
+* Pagination
+*/
+$(document).on('click', '#result_container .pagination-link', function(e){
+ e.preventDefault();
+ var url = $(this).attr('href');
+ $.ajax({
+  url : url,
+  type : "GET",
+  success: function (response) {
+        $('html, body').animate({ scrollTop: $('#result_container').offset().top-20 }, 'slow');
+   		var success =  $($.parseHTML(response)).find("#result_container");
+   		$('#result_container').html(success[0].innerHTML);
+   		//$(window).scrollTop($('#result_container').offset().top-20);
+    },
+    error: function(jqXHR, textStatus, errorThrown) {
+       console.log(textStatus, errorThrown);
+    }
+ });
+});
+
+function GoBack()
+{
+	history.back();
+}
+
+$(document).ready(function(){
+	var currentURL = document.URL;
+	var params = currentURL.split('/');
+	var active_page = params[params.length-1];
+	var default_active_page = '?page=en_Home';
+	$('.main-top-link').each(function(){
+		if($(this).attr('href') == active_page || $(this).attr('href') == 'index.php'+active_page ){
+			default_active_page = active_page;
+		}
+	});
+	
+	if(active_page.indexOf('search') > 0){
+	    default_active_page = '?page=en_Search';
+	}
+	
+	$('.main-top-link').each(function(){
+		if($(this).attr('href') == default_active_page || $(this).attr('href') == 'index.php'+default_active_page){
+			$(this).addClass('active');
+			$(this).css('color','#212426');
+			$(this).css('border-top','2px solid #1650e3');
+		}
+	});
+});
+$('input#phone,input#mobile').keypress(function(e) {
+	    var a = [];
+		var k = e.which;
+        $(this).attr("maxlength","10");
+		for (i = 48; i < 58; i++){
+		    a.push(i);
+		    $(this).css({"border": "1px solid #ededed;"})	
+		}
+		if (!(a.indexOf(k)>=0)){
+			e.preventDefault(); 
+		    $(this).css({"border":"1px solid #ff0000"})
+		}else{
+		    $(this).css({"border":"1px solid #ededed"})	
+		}
+	});
+$('#first_name,#last_name,#contact_person').keypress(function (e) {
+        var regex = new RegExp(/^[a-zA-Z\s]|[\t\b]+$/);
+       
+        var str = String.fromCharCode(!e.charCode ? e.which : e.charCode);
+        if (regex.test(str)) {
+            return true;
+        }
+        else {
+            e.preventDefault();
+            return false;
+        }
+    });
+$('.upload-company-logo').on('change', function () {
+    var filename = $(this).find('input[type=file]').val().replace(/C:\\fakepath\\/i, '');
+	$(this).find('.file_name').html(filename);	
+});
+/*Menu Actove*/
+$(document).ready(function() {
+	var url = $(location).attr('href');
+	$('.main-nav a').each(function(){
+		if($(this).attr('href') == url){
+			$(this).addClass('current');
+		}
+	});
+});
